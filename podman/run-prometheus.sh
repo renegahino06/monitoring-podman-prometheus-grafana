@@ -3,18 +3,8 @@ set -e
 
 NETWORK_NAME=monitor-net
 
-# Detectar ruta absoluta del repo (desde donde ejecutas el script)
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-
-PROMETHEUS_CONFIG="${REPO_ROOT}/prometheus/prometheus.yml"
-
-echo "Usando Prometheus config en: ${PROMETHEUS_CONFIG}"
-
-# Opcional: mostrar contenido para debug
-if [ ! -f "${PROMETHEUS_CONFIG}" ]; then
-  echo "ERROR: No se encontró prometheus.yml en ${PROMETHEUS_CONFIG}"
-  exit 1
-fi
+echo "Usando configuración por defecto de Prometheus dentro del contenedor."
+echo "Este script no monta prometheus.yml desde el host por limitaciones de Git Bash en Windows."
 
 # Eliminar contenedor previo si existe
 if podman ps -a --format '{{.Names}}' | grep -q '^prometheus$'; then
@@ -22,11 +12,12 @@ if podman ps -a --format '{{.Names}}' | grep -q '^prometheus$'; then
   podman rm -f prometheus
 fi
 
+# Levantar Prometheus con config interna
 podman run -d \
   --name prometheus \
   --network "${NETWORK_NAME}" \
   -p 9090:9090 \
-  -v "${PROMETHEUS_CONFIG}:/etc/prometheus/prometheus.yml:Z" \
   docker.io/prom/prometheus
 
 echo "Prometheus iniciado en http://localhost:9090"
+echo "Ve a Status -> Targets para ver los scrape jobs por defecto."
