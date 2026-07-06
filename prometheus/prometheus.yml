@@ -2,6 +2,12 @@ global:
   scrape_interval: 15s
 
 scrape_configs:
+  # Job para Prometheus (opcional, se auto-monitorea)
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["prometheus:9090"]
+
+  # Job para la app-demo
   - job_name: "app-demo"
     static_configs:
       - targets: ["app-demo:8000"]
